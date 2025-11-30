@@ -254,7 +254,3 @@ LinkedIn: [https://www.linkedin.com/in/fnu-gaurav-653355252/](https://www.linked
 GitHub: [https://github.com/Dx2905](https://github.com/Dx2905)
 
 ---
-
-# 🚀 Project 2 README is ready.
-
-Say **“Proceed to Project 3”** and I’ll generate the final README.md for **uncertainty-viz-playground**.
