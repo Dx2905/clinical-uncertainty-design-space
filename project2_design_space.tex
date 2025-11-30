@@ -1,0 +1,222 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+
+\title{A Design Space of Uncertainty and Explanation Views for Clinical Risk Dashboards}
+\author{Gaurav}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Clinical decision-support systems increasingly incorporate machine learning models to estimate patient risk. 
+However, raw risk scores are difficult to interpret without corresponding uncertainty information or supporting explanations. 
+We present a five-prototype design space illustrating how uncertainty and explanations can be visualized, combined, 
+and composed into clinical dashboards. 
+Across seven dimensions---task purpose, uncertainty type, visual encoding, cognitive complexity, granularity, 
+explanation integration, and intended audience---we characterize how different representations support different clinical needs. 
+The prototypes include distributional dotplots, hybrid interval--explanation views, risk spectrum bars, 
+dashboard layouts, and small-multiple comparison views, forming a compact foundation for future exploration 
+of uncertainty-aware clinical AI interfaces.
+\end{abstract}
+
+\section{Introduction}
+Clinical AI systems increasingly provide risk scores for diagnosis and triage, yet these scores alone are insufficient 
+without uncertainty and explainability. Uncertainty helps clinicians gauge the confidence of the estimate, while explanations 
+help them understand why. Prior research in uncertainty visualization and explainable AI suggests multiple ways 
+to encode uncertainty (intervals, distributions, stability) and explanations (feature contributions, SHAP values), 
+but relatively little work integrates them into coherent design variations suitable for clinical dashboards.
+
+This work presents a structured design space and five corresponding prototypes for visualizing uncertainty and explanations 
+in clinical decision support. The design space offers a conceptual scaffold that practitioners and researchers can use 
+to reason about how different combinations of encodings affect interpretability, cognitive load, and workflow fit.
+
+We instantiate the design space using a heart-disease risk prediction task with three archetype patients: a confident low-risk case (LOW\_tight), 
+an uncertain borderline case (MID\_wide), and a confident high-risk case (HIGH\_tight). 
+All prototypes are implemented in Python and generate static figures meant to stand in for candidate dashboard views.
+
+\section{Prototype Gallery}
+
+\subsection{P3: Risk Spectrum Bar (Low-Complexity Triage View)}
+Prototype 3 provides a low-complexity ``triage'' view: a color-coded low/medium/high risk bar 
+overlaid with a 95\% confidence interval (CI) band and a point estimate. 
+The clinician can quickly see whether the current patient is in a low, medium, or high risk region and whether the estimate is precise or uncertain.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figs/proto3_HEART_MID_wide.png}
+    \caption{Prototype P3: risk spectrum bar for the MID\_wide heart-disease patient. 
+    The background indicates low/medium/high risk zones, the gray band encodes the CI, 
+    and the vertical line marks the mean risk.}
+    \label{fig:p3}
+\end{figure}
+
+\subsection{P2: Interval + SHAP Hybrid}
+Prototype 2 combines a simple risk interval (mean + CI) with a horizontal SHAP bar chart. 
+The left panel shows an interval plot of predicted risk, while the right panel visualizes the top features 
+sorted by absolute SHAP value. This supports quick understanding of both risk magnitude and its main drivers.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figs/proto2_HEART_MID_wide.png}
+    \caption{Prototype P2: interval + SHAP hybrid for the MID\_wide patient. 
+    The left interval plot shows the CI around the mean risk; the right panel shows feature contributions (SHAP values).}
+    \label{fig:p2}
+\end{figure}
+
+\subsection{P1: Dotplot + Explanation Stability}
+Prototype 1 visualizes prediction \emph{distribution} via quantile-style dotplots 
+and explanation \emph{stability} via bootstrap-sampled SHAP values for the top feature. 
+The left panel shows the distribution of predicted risk under bootstrap resampling of the model, 
+while the right panel shows how the SHAP value of the most important feature varies across bootstraps.
+This prototype targets detailed uncertainty inspection for data-savvy clinicians or researchers.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figs/proto1_HEART_MID_wide.png}
+    \caption{Prototype P1: prediction and explanation uncertainty for the MID\_wide patient. 
+    Left: dotplot of bootstrap predictions with CI markers. 
+    Right: dotplot of bootstrap SHAP values for the top feature, visualizing explanation stability.}
+    \label{fig:p1}
+\end{figure}
+
+\subsection{P4: Dashboard Layout (Integrated Card View)}
+Prototype 4 integrates the previous elements into a single dashboard card: 
+a risk spectrum bar at the top (summary), a prediction uncertainty dotplot in the middle (distribution), 
+and SHAP feature contributions at the bottom (explanations). 
+This prototype illustrates multi-level uncertainty communication within a single patient view.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figs/proto4_HEART_dashboard_MID_wide.png}
+    \caption{Prototype P4: integrated dashboard layout for the MID\_wide patient. 
+    The card combines a spectrum-based summary, a distributional uncertainty view, and feature-level explanations.}
+    \label{fig:p4}
+\end{figure}
+
+\subsection{P5: Comparison View (Small Multiples Across Archetypes)}
+Prototype 5 shows small-multiple uncertainty and explanation views across the three archetype patients 
+(Confident low, Uncertain mid, Confident high). 
+The top row uses compact CI plots; the bottom row shows tiny SHAP bar charts of the top features for each patient. 
+This supports comparative assessment and teaching, helping clinicians calibrate their understanding of model behavior 
+across qualitatively different cases.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figs/proto5_HEART_comparison_view.png}
+    \caption{Prototype P5: comparative view across archetype patients (Confident low, Uncertain mid, Confident high). 
+    Each column shows a compact interval plot and a mini SHAP bar chart, with semantic labels underneath.}
+    \label{fig:p5}
+\end{figure}
+
+\section{Design Space Dimensions}
+We organize the prototypes along seven design dimensions characterizing uncertainty and explanation visualization choices.
+
+\begin{enumerate}
+    \item \textbf{Primary Task / Purpose} -- triage, uncertainty inspection, explanation inspection, multi-level integration, comparison.
+    \item \textbf{Uncertainty Type} -- prediction range (CI); prediction distribution (samples); explanation uncertainty (SHAP variability).
+    \item \textbf{Visual Encoding} -- CI bars, CI bands, dotplots, color-coded risk zones, SHAP bars, small multiples.
+    \item \textbf{Cognitive Complexity} -- low, medium, or high depending on clinician workload and time pressure.
+    \item \textbf{Granularity} -- single-patient vs.\ multi-patient views.
+    \item \textbf{Explainability Integration} -- none; hybrid risk + explanation; stability views; embedded dashboard layouts; comparative explanations.
+    \item \textbf{Intended Audience} -- busy clinicians, trainees, or data-savvy clinicians and AI researchers.
+\end{enumerate}
+
+These dimensions emerged through iterative sketching and implementation of the five prototypes, as well as reflection on 
+clinical scenarios observed in the literature.
+
+\section{Design Space Summary Table}
+Table~\ref{tab:designspace} summarizes how the five prototypes map onto the design dimensions.
+
+% \begin{table}[htbp]
+% \centering
+% \small
+% \begin{tabular}{p{0.8cm} p{3.2cm} p{3.0cm} p{3.6cm} p{1.5cm} p{1.4cm} p{3.2cm}}
+% \toprule
+% \textbf{Proto} & \textbf{Primary Purpose} & \textbf{Uncertainty Type} & \textbf{Encoding} & \textbf{Complexity} & \textbf{Granularity} & \textbf{Explainability Integration} \\
+% \midrule
+% P1 & Inspect uncertainty in prediction and top explanation & Distribution + SHAP variability & Dotplots (risk + SHAP) with CI markers & High & Single & Stability of top feature \\
+% P2 & See risk range and \emph{why} in one glance & CI range & Interval line + SHAP bars & Medium & Single & Parallel hybrid (risk + SHAP) \\
+% P3 & Quick triage under time pressure & CI range & Risk spectrum (color) + CI band & Low & Single & None (pure uncertainty) \\
+% P4 & Integrated dashboard card & CI + distribution & Spectrum bar + dotplot + SHAP bars & Med--High & Single & Embedded explanations and uncertainty \\
+% P5 & Compare archetype patients & CI across patients & Small-multiple CI plots + SHAP bars & Medium & Multi & Parallel per-patient explanations \\
+% \bottomrule
+% \end{tabular}
+% \caption{Design space summary: five prototypes positioned along task purpose, uncertainty type, visual encoding, complexity, granularity, and explainability integration.}
+% \label{tab:designspace}
+% \end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{3pt} % tighter horizontal padding
+\begin{tabularx}{\textwidth}{l
+                                    X
+                                    X
+                                    X
+                                    l
+                                    l
+                                    X}
+\toprule
+\textbf{Proto} & \textbf{Primary Purpose} & \textbf{Uncertainty Type} &
+\textbf{Encoding} & \textbf{Complexity} & \textbf{Granularity} &
+\textbf{Explainability Integration} \\
+\midrule
+P1 & Inspect uncertainty in prediction and top explanation &
+Distribution + SHAP variability &
+Dotplots (risk and SHAP), CI markers &
+High & Single & Stability of top feature \\
+P2 & See range and why &
+CI range &
+Interval line + SHAP bars &
+Medium & Single & Parallel hybrid (risk + SHAP) \\
+P3 & Quick triage &
+CI range &
+Risk spectrum (color) + CI band &
+Low & Single & None (uncertainty only) \\
+P4 & Integrated dashboard &
+CI + distribution &
+Spectrum bar + dotplot + SHAP bars &
+Med--High & Single & Embedded explanations in dashboard card \\
+P5 & Compare archetypes &
+CI across patients &
+Small-multiple CI + small-multiple SHAP bars &
+Medium & Multi & Parallel per-patient explanations \\
+\bottomrule
+\end{tabularx}
+\caption{Summary of the five prototypes across key design dimensions.}
+\label{tab:designspace}
+\end{table}
+    
+
+\section{Discussion}
+The five prototypes collectively demonstrate how uncertainty and explanation can be layered, separated, or combined 
+depending on clinical information needs. Simpler views (P3) support rapid triage and could be embedded into existing electronic health record interfaces. 
+Distributional and stability views (P1) support deeper sensemaking by data-savvy clinicians or AI teams who must audit model behavior. 
+Composite designs (P4) illustrate how multi-level uncertainty and explanations can coexist in a single patient card, 
+while comparative views (P5) reveal archetype-level patterns that clinicians might use for calibration or teaching.
+
+The design space also highlights tensions. For example, adding explanation stability (P1) increases cognitive complexity, 
+which may not be appropriate for time-pressured settings. Conversely, very simple encodings (P3) can hide important nuances, 
+such as multimodal predictive distributions. Prototype 4 balances these tensions by offering both summary and detail views.
+
+\section{Limitations and Future Work}
+The current prototypes are conceptual and use simulated prediction and SHAP samples based on three representative heart-disease cases. 
+We do not claim that any particular design is optimal. A full evaluation with clinicians would be needed to validate interpretability, 
+trust calibration, and workflow fit. Future work could extend the design space to interactive views, integrate temporal trends, 
+and explore patient-facing versions of uncertainty explanations.
+
+\section{Conclusion}
+This work proposes a five-prototype design space for uncertainty and explanation views in clinical risk dashboards. 
+By articulating how uncertainty and explanation combine across visual encodings, complexity levels, and clinical tasks, 
+the design space provides a structured starting point for future uncertainty-aware clinical AI interfaces. 
+We hope the prototypes and dimensions will help both researchers and practitioners reason more systematically 
+about how to communicate uncertainty and explanations in high-stakes decision support.
+
+\end{document}
