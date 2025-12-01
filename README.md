@@ -7,12 +7,12 @@
 
 ## 🔖 Badges
 
-```
+
 [![Research](https://img.shields.io/badge/Research-HDI%2FXAI-blue)]()
 [![Visualization](https://img.shields.io/badge/Visualization-Uncertainty-orange)]()
 [![LaTeX](https://img.shields.io/badge/Document-LaTeX-green)]()
 [![Status](https://img.shields.io/badge/Status-Complete-brightgreen)]()
-```
+
 
 ---
 
